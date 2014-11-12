@@ -21,6 +21,7 @@ if DUMP_VCF:
     FILE_NAME = 'data/ALL.chr%s.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf' % CHR_NUM
     NUM_SAMPLES = 2504
     NUM_F = get_num_features(FILE_NAME)
+    print "NUM_F: %d" % NUM_F
 
     def nnz(s):
         A = s[0]
@@ -66,7 +67,7 @@ if DUMP_LABELS:
     Y_pop = np.array(Y_pop).T
     Y_superpop = np.array(Y_superpop).T
     print Y_pop.shape
-    print (Y_superpop.shape)
+    print Y_superpop.shape
     joblib.dump(Y_pop, 'blobs/Y_pop.pkl')
     joblib.dump(Y_superpop, 'blobs/Y_superpop.pkl')
     sys.exit(0)
