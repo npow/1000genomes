@@ -37,7 +37,7 @@ if DUMP_VCF:
         idx += 1
     X = sparse.csr_matrix(np.array(X).T)
     print X.shape
-    joblib.dump(X, 'blobs/X_%s.pkl' % CHR_NUM)
+    joblib.dump(X, 'blobs/X_%s.pkl' % CHR_NUM, compress=9)
     sys.exit(0)
 
 if DUMP_LABELS:
