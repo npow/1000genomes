@@ -50,7 +50,7 @@ if DUMP_VCF:
                 X[idx, j] = v
         idx += 1
     print X.shape
-    joblib.dump(X.T, 'blobs/X_%s.pkl' % CHR_NUM)
+    joblib.dump(X.T.tocoo(), 'blobs/X_%s.pkl' % CHR_NUM)
     f.close()
     sys.exit(0)
 
