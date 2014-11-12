@@ -3,6 +3,16 @@ from scipy import sparse
 from sklearn.externals import joblib
 import sys
 
+def get_num_features(file_name):
+    f = open(file_name)
+    idx = 0
+    for line in f:
+        if line[0] == '#':
+            continue
+        idx += 1
+    f.close()
+    return idx
+
 DUMP_LABELS = False
 DUMP_VCF = True
 if DUMP_VCF:
@@ -10,6 +20,7 @@ if DUMP_VCF:
     print CHR_NUM
     FILE_NAME = 'data/ALL.chr%s.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf' % CHR_NUM
     NUM_SAMPLES = 2504
+    NUM_F = get_num_features(FILE_NAME)
 
     def nnz(s):
         A = s[0]
@@ -24,7 +35,7 @@ if DUMP_VCF:
             return 2
 
     idx = 0
-    X = []
+    X = sparse.lil_matrix((NUM_F, NUM_SAMPLES))
     f = open(FILE_NAME)
     for line in f:
         if line[0] == '#':
@@ -32,12 +43,14 @@ if DUMP_VCF:
         if idx % 10000 == 0:
             print idx
         line = line.split('\t')[9:]
-        row = [nnz(x) for x in line]
-        X.append(row)
+        for j, x in enumerate(line):
+            v = nnz(x)
+            if v > 0:
+                X[idx, j] = v
         idx += 1
-    X = sparse.csr_matrix(np.array(X).T)
     print X.shape
-    joblib.dump(X, 'blobs/X_%s.pkl' % CHR_NUM, compress=9)
+    joblib.dump(X.T, 'blobs/X_%s.pkl' % CHR_NUM)
+    f.close()
     sys.exit(0)
 
 if DUMP_LABELS:
