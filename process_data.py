@@ -69,6 +69,8 @@ if DUMP_VCF:
     X = sparse.lil_matrix((NUM_F, NUM_SAMPLES))
     f = gzip.open(FILE_NAME)
     for line in f:
+        if idx > 10:
+          break
         if line[0] == '#':
             continue
         if idx % 10000 == 0:
@@ -81,7 +83,7 @@ if DUMP_VCF:
         idx += 1
     print X.shape
     f.close()
-    store_sparse_matrix(X.T.tocoo(), 'X_%s' % CHR_NUM)
+    store_sparse_matrix(X.T.tocsr(), 'X_%s' % CHR_NUM)
     sys.exit(0)
 
 if DUMP_LABELS:
