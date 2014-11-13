@@ -87,7 +87,7 @@ if DUMP_VCF:
     sys.exit(0)
 
 if DUMP_LABELS:
-    f = open('data/labels.txt')
+    f = open('labels.txt')
     Y_pop = []
     Y_superpop = []
     for i, line in enumerate(f):
