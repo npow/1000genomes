@@ -1,10 +1,12 @@
 import numpy as np
 from scipy import sparse
 from sklearn.externals import joblib
+import h5py
+import gzip
 import sys
 
 def get_num_features(file_name):
-    f = open(file_name)
+    f = gzip.open(file_name)
     idx = 0
     for line in f:
         if line[0] == '#':
@@ -18,7 +20,7 @@ DUMP_VCF = True
 if DUMP_VCF:
     CHR_NUM = sys.argv[1]
     print CHR_NUM
-    FILE_NAME = 'data/ALL.chr%s.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf' % CHR_NUM
+    FILE_NAME = 'data/ALL.chr%s.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf.gz' % CHR_NUM
     NUM_SAMPLES = 2504
     NUM_F = get_num_features(FILE_NAME)
     print "NUM_F: %d" % NUM_F
@@ -37,7 +39,7 @@ if DUMP_VCF:
 
     idx = 0
     X = sparse.lil_matrix((NUM_F, NUM_SAMPLES))
-    f = open(FILE_NAME)
+    f = gzip.open(FILE_NAME)
     for line in f:
         if line[0] == '#':
             continue
@@ -50,7 +52,10 @@ if DUMP_VCF:
                 X[idx, j] = v
         idx += 1
     print X.shape
-    joblib.dump(X.T.tocoo(), 'blobs/X_%s.pkl' % CHR_NUM)
+    #joblib.dump(X.T.tocoo(), 'blobs/X_%s.pkl' % CHR_NUM)
+    h5f = h5py.File('blobs/X_%s.h5' % CHR_NUM, 'w')
+    h5f.create_dataset('X_%s' % CHR_NUM, data=X.T.tocoo(), compression="gzip", compression_opts=9)
+    h5f.close()
     f.close()
     sys.exit(0)
 
