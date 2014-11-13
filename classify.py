@@ -10,9 +10,10 @@ from sklearn.linear_model import *
 from sklearn.neighbors import *
 from sklearn.svm import *
 from sklearn import metrics
+from .utils import *
 
-X_21 = joblib.load('blobs/X_21.pkl')
-X_22 = joblib.load('blobs/X_22.pkl')
+X_21 = load_sparse_matrix('blobs/X_21.pkl')
+X_22 = load_sparse_matrix('blobs/X_22.pkl')
 X = scipy.sparse.hstack((X_21, X_22))
 del X_21
 del X_22
