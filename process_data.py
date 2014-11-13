@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import sparse
 from sklearn.externals import joblib
-from .utils import *
+from utils import *
 import gzip
 import sys
 

@@ -10,7 +10,7 @@ from sklearn.linear_model import *
 from sklearn.neighbors import *
 from sklearn.svm import *
 from sklearn import metrics
-from .utils import *
+from utils import *
 
 X_21 = load_sparse_matrix('blobs/X_21.pkl')
 X_22 = load_sparse_matrix('blobs/X_22.pkl')
