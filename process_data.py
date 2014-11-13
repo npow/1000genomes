@@ -69,8 +69,6 @@ if DUMP_VCF:
     X = sparse.lil_matrix((NUM_F, NUM_SAMPLES))
     f = gzip.open(FILE_NAME)
     for line in f:
-        if idx > 10:
-          break
         if line[0] == '#':
             continue
         if idx % 10000 == 0:
