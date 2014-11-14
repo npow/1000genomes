@@ -3,6 +3,7 @@ import tables as tb
 from scipy import sparse
 from sklearn.externals import joblib
 import h5py
+import gzip
 
 def store_sparse_matrix(m, name):
     msg = "This code only works for csr matrices"
