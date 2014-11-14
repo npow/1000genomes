@@ -17,7 +17,7 @@ from utils import *
 def load(L):
   return scipy.sparse.hstack([load_sparse_matrix(x) for x in L])
 
-chromosomes = [21, 22]
+chromosomes = [5, 22]
 X = load(["X_%d" % c for c in chromosomes])
 Y = joblib.load('blobs/Y_pop.pkl')
 print chromosomes
@@ -29,11 +29,11 @@ X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.1, random_
 
 #clf = LinearSVC(penalty='l2')
 clf = RandomForestClassifier(n_estimators=100, n_jobs=4)
-if clf in [RandomForestClassifier]:
-  clf.fit(X_train.todense(), Y_train)
+if type(clf) in [RandomForestClassifier]:
+  clf.fit(X_train.toarray(), Y_train)
   print "DONE FIT"
   sys.stdout.flush()
-  pred = clf.predict(X_test.todense())
+  pred = clf.predict(X_test.toarray())
 else:
   clf.fit(X_train, Y_train)
   print "DONE FIT"
