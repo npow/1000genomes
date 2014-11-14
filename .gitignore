@@ -1,3 +1,6 @@
 blobs
 docs
 *.vcf
+*.txt
+*.pyc
+data
