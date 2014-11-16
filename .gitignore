@@ -4,3 +4,4 @@ docs
 *.txt
 *.pyc
 data
+results
