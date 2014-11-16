@@ -43,7 +43,7 @@ X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.1, random_
 joblib.dump(Y_test, 'blobs/Y_test.pkl')
 
 select = SelectKBest(chi2, k=1000)
-X_train = select.fit_transform(X_train)
+X_train = select.fit_transform(X_train, Y_train)
 X_test = select.transform(X_test)
 print X_train.shape
 print X_test.shape
