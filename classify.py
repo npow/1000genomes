@@ -16,7 +16,7 @@ from sklearn import metrics
 from utils import *
 np.random.seed(42)
 
-PREFIX = "linearsvc_chr%s" % sys.argv[1]
+PREFIX = "sgdclassifier_chr%s" % sys.argv[1]
 print PREFIX
 
 def load(L):
@@ -44,24 +44,24 @@ X_base, X_valid, Y_base, Y_valid = train_test_split(X, Y, test_size=0.1, random_
 X_train_meta = []
 Y_train_meta = []
 
-skf = StratifiedKFold(Y_base, n_folds=10, shuffle=True, random_state=42)
+skf = StratifiedKFold(Y_base, n_folds=4, shuffle=True, random_state=42)
 for train_indices, test_indices in skf:
   X_train, Y_train = X_base[train_indices], Y_base[train_indices]
   X_test, Y_test = X_base[test_indices], Y_base[test_indices]
 
-  clf = LinearSVC()
+  clf = SGDClassifier(n_jobs=-1, n_iter=1)
   clf.fit(X_train, Y_train)
   print "DONE FIT"
   sys.stdout.flush()
   X_train_meta.append(clf.decision_function(X_test))
   Y_train_meta.append(Y_test)
 
-clf = LinearSVC()
+clf = SGDClassifier(n_jobs=-1, n_iter=1)
 clf.fit(X_base, Y_base)
 X_test_meta = clf.decision_function(X_valid)
 
 X_train_meta = np.concatenate(X_meta, axis=0)
-clf = LinearSVC()
+clf = SGDClassifier(n_jobs=-1, n_iter=1)
 clf.fit(X_train_meta, Y_train_meta)
 pred = clf.predict(X_test_meta)
 
