@@ -39,35 +39,39 @@ le = LabelEncoder()
 Y = le.fit_transform(Y)
 joblib.dump(le, 'blobs/le.pkl')
 
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.1, random_state=42)
-joblib.dump(Y_test, 'blobs/Y_test.pkl')
+X_base, X_valid, Y_base, Y_valid = train_test_split(X, Y, test_size=0.1, random_state=42)
 
-select = SelectKBest(chi2, k=1000)
-X_train = select.fit_transform(X_train, Y_train)
-X_test = select.transform(X_test)
-print X_train.shape
-print X_test.shape
+X_train_meta = []
+Y_train_meta = []
 
-clf = LinearSVC(penalty='l2')
-#clf = RandomForestClassifier(n_estimators=3000, n_jobs=4)
-if type(clf) in [RandomForestClassifier]:
-  clf.fit(X_train.toarray(), Y_train)
-  print "DONE FIT"
-  sys.stdout.flush()
-  pred = clf.predict(X_test.toarray())
-  dist = clf.decision_function(X_test.toarray())
-else:
+skf = StratifiedKFold(Y_base, n_folds=10, shuffle=True, random_state=42)
+for train_indices, test_indices in skf:
+  X_train, Y_train = X_base[train_indices], Y_base[train_indices]
+  X_test, Y_test = X_base[test_indices], Y_base[test_indices]
+
+  clf = LinearSVC()
   clf.fit(X_train, Y_train)
   print "DONE FIT"
   sys.stdout.flush()
-  pred = clf.predict(X_test)
-  dist = clf.decision_function(X_test)
+  X_train_meta.append(clf.decision_function(X_test))
+  Y_train_meta.append(Y_test)
 
-joblib.dump(pred, 'blobs/%s_pred.pkl' % PREFIX)
-joblib.dump(dist, 'blobs/%s_dist.pkl' % PREFIX)
+clf = LinearSVC()
+clf.fit(X_base, Y_base)
+X_test_meta = clf.decision_function(X_valid)
 
-score = metrics.f1_score(Y_test, pred)
+X_train_meta = np.concatenate(X_meta, axis=0)
+clf = LinearSVC()
+clf.fit(X_train_meta, Y_train_meta)
+pred = clf.predict(X_test_meta)
+
+score = metrics.f1_score(Y_valid, pred)
 print("f1-score:   %0.3f" % score)
 
 print("classification report:")
 print(metrics.classification_report(le.inverse_transform(Y_test), le.inverse_transform(pred)))
+
+joblib.dump(X_train_meta, 'blobs/X_train_meta_%s.pkl' % PREFIX)
+joblib.dump(Y_train_meta, 'blobs/Y_train_meta_%s.pkl' % PREFIX)
+joblib.dump(X_test_meta, 'blobs/X_test_meta_%s.pkl' % PREFIX)
+joblib.dump(Y_valid, 'blobs/Y_test_meta_%s.pkl' % PREFIX)
