@@ -71,7 +71,7 @@ score = metrics.f1_score(Y_valid, pred)
 print("f1-score:   %0.3f" % score)
 
 print("classification report:")
-print(metrics.classification_report(le.inverse_transform(Y_test), le.inverse_transform(pred)))
+print(metrics.classification_report(le.inverse_transform(Y_valid), le.inverse_transform(pred)))
 
 joblib.dump(X_train_meta, 'blobs/X_train_meta_%s.pkl' % PREFIX)
 joblib.dump(Y_train_meta, 'blobs/Y_train_meta_%s.pkl' % PREFIX)
