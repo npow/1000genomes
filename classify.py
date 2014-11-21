@@ -60,6 +60,7 @@ clf = SGDClassifier(n_jobs=-1, n_iter=1)
 clf.fit(X_base, Y_base)
 X_test_meta = clf.decision_function(X_valid)
 X_train_meta = np.concatenate(X_train_meta, axis=0)
+Y_train_meta = np.concatenate(Y_train_meta, axis=0)
 print "DONE CREATING META"
 
 clf = SGDClassifier(n_jobs=-1, n_iter=1)
