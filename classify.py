@@ -59,8 +59,9 @@ for train_indices, test_indices in skf:
 clf = SGDClassifier(n_jobs=-1, n_iter=1)
 clf.fit(X_base, Y_base)
 X_test_meta = clf.decision_function(X_valid)
+X_train_meta = np.concatenate(X_train_meta, axis=0)
+print "DONE CREATING META"
 
-X_train_meta = np.concatenate(X_meta, axis=0)
 clf = SGDClassifier(n_jobs=-1, n_iter=1)
 clf.fit(X_train_meta, Y_train_meta)
 pred = clf.predict(X_test_meta)
