@@ -21,8 +21,6 @@ from sklearn import metrics
 from utils import *
 np.random.seed(42)
 
-USE_STACKING = True
-
 if len(sys.argv) == 1:
   print "No chromosomes specified"
   sys.exit(1)
@@ -55,39 +53,12 @@ def main():
     Y = le.fit_transform(Y)
     joblib.dump(le, 'blobs/le.pkl')
 
-    if USE_STACKING:
-        skf = StratifiedKFold(Y, n_folds=4, shuffle=True, random_state=42)
-        for train_indices, test_indices in skf:
-            X_train, Y_train = X[train_indices], Y[train_indices]
-            X_test, Y_test = X[test_indices], Y[test_indices]
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.1, random_state=42)
+    clf = LinearSVC()
+    clf.fit(X_train, Y_train)
 
-            clf = Pipeline([
-                ('t', Transformer(LinearSVC().fit(X_train, Y_train).decision_function)),
-                ('c', LinearSVC()),
-            ])
-
-            clf.fit(X_train, Y_train)
-            print "DONE FIT"
-            sys.stdout.flush()
-
-            pred = clf.predict(X_test)
-
-            score = metrics.f1_score(Y_test, pred)
-            print("f1-score:   %0.3f" % score)
-
-            print("classification report:")
-            print(metrics.classification_report(le.inverse_transform(Y_test), le.inverse_transform(pred)))
-    else:
-        X_base, X_valid, Y_base, Y_valid = train_test_split(X, Y, test_size=0.1, random_state=42)
-        clf = LinearSVC()
-        clf.fit(X_base, Y_base)
-        pred = clf.predict(X_valid)
-
-        score = metrics.f1_score(Y_valid, pred)
-        print("f1-score:   %0.3f" % score)
-
-        print("classification report:")
-        print(metrics.classification_report(le.inverse_transform(Y_valid), le.inverse_transform(pred)))
+    joblib.dump(clf.decision_function(X_train), 'blobs/X_train_meta_%s.pkl' % sys.argv[1])
+    joblib.dump(clf.decision_function(X_test), 'blobs/X_test_meta_%s.pkl' % sys.argv[1])
 
 if __name__ == '__main__':
     main()
