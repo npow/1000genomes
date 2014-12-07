@@ -57,16 +57,17 @@ def main():
     else:
         X_train_meta = []
         X_test_meta = []
-    for cs in all_subsets(chromosomes):
+    for cs in combinations(chromosomes, 5):#all_subsets(chromosomes):
         if cs == ():
             continue
         print cs
         X_train = load(["blobs/X_train_meta_%d.pkl" % c for c in cs])
         X_test = load(["blobs/X_test_meta_%d.pkl" % c for c in cs])
+        estimator = RandomForestClassifier(n_jobs=-1)
 
         clf = Pipeline([
             ('t', StandardScaler()),
-            ('c', LinearSVC())
+            ('c', estimator)
 #            ('c', DBN([X_train.shape[1], X_train.shape[1], np.unique(Y_train).shape[0]], epochs=10, verbose=1))
         ])
         clf.fit(X_train, Y_train)
@@ -76,8 +77,12 @@ def main():
             for i, p in enumerate(pred):
                 votes[i][p] += 1
         else:
-            X_train_meta.append(clf.decision_function(X_train))
-            X_test_meta.append(clf.decision_function(X_test))
+            if type(estimator) in [RandomForestClassifier]:
+                X_train_meta.append(clf.predict_proba(X_train))
+                X_test_meta.append(clf.predict_proba(X_test))
+            else:
+                X_train_meta.append(clf.decision_function(X_train))
+                X_test_meta.append(clf.decision_function(X_test))
 
     if USE_VOTING:
         pred = np.zeros((Y_test.shape[0], 1))
@@ -86,7 +91,8 @@ def main():
     else:
         X_train_meta = np.concatenate(X_train_meta, axis=1)
         X_test_meta = np.concatenate(X_test_meta, axis=1)
-        clf = DBN([X_train_meta.shape[1], X_train_meta.shape[1]//4, X_train_meta.shape[1], np.unique(Y_train).shape[0]], epochs=5, verbose=1, learn_rates=0.01)
+        clf = DBN([X_train_meta.shape[1], X_train_meta.shape[1]*2, np.unique(Y_train).shape[0]], epochs=200, verbose=1, learn_rates=0.001)
+        #clf = RandomForestClassifier(n_jobs=-1)
         clf.fit(X_train_meta, Y_train)
         pred = clf.predict(X_test_meta)
 
