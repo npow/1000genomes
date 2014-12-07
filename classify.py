@@ -38,27 +38,30 @@ class Transformer(BaseEstimator, TransformerMixin):
 def load(L):
   return scipy.sparse.hstack([load_sparse_matrix(x) for x in L])
 
-def main():
-    chromosomes = [int(x) for x in sys.argv[1].split(',')]
-    print "Chromosomes: ", chromosomes
-    sys.stdout.flush()
-
-    X = load(["X_%d" % c for c in chromosomes])
-    Y = joblib.load('blobs/Y_pop.pkl')
+def classify(X, target):
+    Y = joblib.load('blobs/Y_%s.pkl' % target)
     print X.shape
     print Y.shape
     sys.stdout.flush()
 
     le = LabelEncoder()
     Y = le.fit_transform(Y)
-    joblib.dump(le, 'blobs/le.pkl')
+    joblib.dump(le, 'blobs/le_%s.pkl' % target)
 
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.1, random_state=42)
     clf = LinearSVC()
     clf.fit(X_train, Y_train)
 
-    joblib.dump(clf.decision_function(X_train), 'blobs/X_train_meta_%s.pkl' % sys.argv[1])
-    joblib.dump(clf.decision_function(X_test), 'blobs/X_test_meta_%s.pkl' % sys.argv[1])
+    joblib.dump(clf.decision_function(X_train), 'blobs/X_train_meta_%s_%s.pkl' % (sys.argv[1], target))
+    joblib.dump(clf.decision_function(X_test), 'blobs/X_test_meta_%s_%s.pkl' % (sys.argv[1], target))
+
+def main():
+    chromosomes = [int(x) for x in sys.argv[1].split(',')]
+    print "Chromosomes: ", chromosomes
+    sys.stdout.flush()
+
+    X = load(["X_%d" % c for c in chromosomes])
+    classify(X, 'superpop')
 
 if __name__ == '__main__':
     main()
