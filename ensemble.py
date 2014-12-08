@@ -41,7 +41,7 @@ def all_subsets(ss):
   return chain(*map(lambda x: combinations(ss, x), range(0, len(ss)+1)))
 
 def main():
-    chromosomes = [5, 18, 19, 20, 21, 22]
+    chromosomes = [1, 2, 3, 5, 6, 7, 8, 9, 17, 18, 19, 20, 21, 22]
     print "Chromosomes: ", chromosomes
     sys.stdout.flush()
 
@@ -57,7 +57,7 @@ def main():
     else:
         X_train_meta = []
         X_test_meta = []
-    for cs in combinations(chromosomes, 5):#all_subsets(chromosomes):
+    for cs in all_subsets(chromosomes):
         if cs == ():
             continue
         print cs
