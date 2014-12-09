@@ -46,6 +46,12 @@ def main():
     X_test = load(["blobs/X_test_meta_rand_%d%s.pkl" % (c, target) for c in chromosomes])
     Y_train = joblib.load('blobs/Y_train%s.pkl' % target)
     Y_test = joblib.load('blobs/Y_test%s.pkl' % target)
+    if target == '':
+        Y_train_superpop = joblib.load('blobs/Y_train_superpop.pkl').reshape((-1,1))
+        Y_test_superpop = joblib.load('blobs/Y_test_superpop.pkl').reshape((-1,1))
+        encoder = OneHotEncoder(sparse=False)
+        X_train = np.concatenate([X_train, encoder.fit_transform(Y_train_superpop)], axis=1)
+        X_test = np.concatenate([X_test, encoder.transform(Y_test_superpop)], axis=1)
     print X_train.shape
     print X_test.shape
     print Y_train.shape
@@ -56,7 +62,9 @@ def main():
     Y_train = le.fit_transform(Y_train)
     Y_test = le.transform(Y_test)
 
-    estimator = BaggingClassifier(base_estimator=LinearSVC(), n_estimators=100, bootstrap_features=False, max_samples=1.0, max_features=1.0)
+    estimator = SVC()
+    estimator = LogisticRegression(class_weight='auto')
+    estimator = BaggingClassifier(base_estimator=LinearSVC(), n_estimators=10, bootstrap_features=True, max_samples=1.0, max_features=1.0)
     clf = Pipeline([
         ('t', StandardScaler()),
 #        ('c', DBN([X_train.shape[1], X_train.shape[1], np.unique(Y_train).shape[0]], epochs=10, verbose=1))
